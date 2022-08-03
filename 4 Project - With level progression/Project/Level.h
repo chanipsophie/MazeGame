@@ -31,5 +31,8 @@ public:
 private:
 	bool ConvertLevel(int* playerX, int* playerY);
 	int GetIndexFromCoordinates(int x, int y);
+	void DrawLevel(int index, int* playerX, int* playerY, int x, int y);
+
+	bool m_anyWarnings = false;
 
 };

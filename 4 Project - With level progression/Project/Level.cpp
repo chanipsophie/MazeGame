@@ -113,90 +113,95 @@ bool Level::IsWall(int x, int y)
 	return m_pLevelData[GetIndexFromCoordinates(x, y)] == WAL;
 }
 
+
+void Level::DrawLevel(int index, int* playerX, int* playerY, int x, int y)
+{
+	switch (m_pLevelData[index])
+	{
+	case '+':
+	case '|':
+	case '-':
+		m_pLevelData[index] = WAL;
+		break;
+	case 'p':
+		m_pLevelData[index] = ' ';
+		m_pActors.push_back(new PersistentKey(x, y, ActorColor::Blue));
+		break;
+	case 'r':
+		m_pLevelData[index] = ' ';
+		m_pActors.push_back(new Key(x, y, ActorColor::Red));
+		break;
+	case 'g':
+		m_pLevelData[index] = ' ';
+		m_pActors.push_back(new Key(x, y, ActorColor::Green));
+		break;
+	case 'b':
+		m_pLevelData[index] = ' ';
+		m_pActors.push_back(new Key(x, y, ActorColor::Blue));
+		break;
+	case 'R':
+		m_pLevelData[index] = ' ';
+		m_pActors.push_back(new Door(x, y, ActorColor::Red, ActorColor::SolidRed));
+		break;
+	case 'G':
+		m_pLevelData[index] = ' ';
+		m_pActors.push_back(new Door(x, y, ActorColor::Green, ActorColor::SolidGreen));
+		break;
+	case 'B':
+		m_pLevelData[index] = ' ';
+		m_pActors.push_back(new Door(x, y, ActorColor::Blue, ActorColor::SolidBlue));
+		break;
+	case 'X':
+		m_pLevelData[index] = ' ';
+		m_pActors.push_back(new Goal(x, y));
+		break;
+	case '$':
+		m_pLevelData[index] = ' ';
+		m_pActors.push_back(new Money(x, y, 1 + rand() % 5));
+		break;
+	case '@':
+		m_pLevelData[index] = ' ';
+		if (playerX != nullptr && playerY != nullptr)
+		{
+			*playerX = x;
+			*playerY = y;
+		}
+		break;
+	case 'e':
+		m_pActors.push_back(new Enemy(x, y));
+		m_pLevelData[index] = ' '; // clear the level
+		break;
+	case 'h':
+		m_pActors.push_back(new Enemy(x, y, 3, 0));
+		m_pLevelData[index] = ' '; // clear the level
+		break;
+	case 'v':
+		m_pLevelData[index] = ' ';
+		m_pActors.push_back(new Enemy(x, y, 0, 2));
+		m_pLevelData[index] = ' '; // clear the level
+		break;
+		break;
+	case ' ':
+		break;
+	default:
+		cout << "Invalid character in level file: " << m_pLevelData[index] << endl;
+		m_anyWarnings = true;
+		break;
+	}
+}
+
 bool Level::ConvertLevel(int* playerX, int* playerY)
 {
-	bool anyWarnings = false;
 	for (int y = 0; y < m_height; ++y)
 	{
 		for (int x = 0; x < m_width; ++x)
 		{
 			int index = GetIndexFromCoordinates(x, y);
-			switch (m_pLevelData[index])
-			{
-			case '+':
-			case '|':
-			case '-':
-				m_pLevelData[index] = WAL;
-				break;
-			case 'p':
-				m_pLevelData[index] = ' ';
-				m_pActors.push_back(new PersistentKey(x, y, ActorColor::Blue));
-				break;
-			case 'r':
-				m_pLevelData[index] = ' ';
-				m_pActors.push_back(new Key(x, y, ActorColor::Red));
-				break;
-			case 'g':
-				m_pLevelData[index] = ' ';
-				m_pActors.push_back(new Key(x, y, ActorColor::Green));
-				break;
-			case 'b':
-				m_pLevelData[index] = ' ';
-				m_pActors.push_back(new Key(x, y, ActorColor::Blue));
-				break;
-			case 'R':
-				m_pLevelData[index] = ' ';
-				m_pActors.push_back(new Door(x, y, ActorColor::Red, ActorColor::SolidRed));
-				break;
-			case 'G':
-				m_pLevelData[index] = ' ';
-				m_pActors.push_back(new Door(x, y, ActorColor::Green, ActorColor::SolidGreen));
-				break;
-			case 'B':
-				m_pLevelData[index] = ' ';
-				m_pActors.push_back(new Door(x, y, ActorColor::Blue, ActorColor::SolidBlue));
-				break;
-			case 'X':
-				m_pLevelData[index] = ' ';
-				m_pActors.push_back(new Goal(x, y));
-				break;
-			case '$':
-				m_pLevelData[index] = ' ';
-				m_pActors.push_back(new Money(x, y, 1 + rand() % 5));
-				break;
-			case '@':
-				m_pLevelData[index] = ' ';
-				if (playerX != nullptr && playerY != nullptr)
-				{
-					*playerX = x;
-					*playerY = y;
-				}
-				break;
-			case 'e':
-				m_pActors.push_back(new Enemy(x, y));
-				m_pLevelData[index] = ' '; // clear the level
-				break;
-			case 'h':
-				m_pActors.push_back(new Enemy(x, y, 3, 0));
-				m_pLevelData[index] = ' '; // clear the level
-				break;
-			case 'v':
-				m_pLevelData[index] = ' ';
-				m_pActors.push_back(new Enemy(x, y, 0, 2));
-				m_pLevelData[index] = ' '; // clear the level
-				break;
-				break;
-			case ' ':
-				break;
-			default:
-				cout << "Invalid character in level file: " << m_pLevelData[index] << endl;
-				anyWarnings = true;
-				break;
-			}
+			DrawLevel(index, playerX, playerY, x, y);	
 		}
 	}
 
-	return anyWarnings;
+	return m_anyWarnings;
 }
 
 int Level::GetIndexFromCoordinates(int x, int y)
