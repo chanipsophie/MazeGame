@@ -2,6 +2,7 @@
 #include "Game.h"
 #include "AudioManager.h"
 #include "StateMachineExampleGame.h"
+#include <thread>
 
 using namespace std;
 
@@ -17,7 +18,9 @@ int main()
 
 	myGame.Deinitialize();
 
-	AudioManager::DestroyInstance();
+	thread DestroyInstance(AudioManager::DestroyInstance);
+
+	DestroyInstance.join();
 
 	return 0;
 }
