@@ -15,4 +15,6 @@ public:
 private:
 	bool Update(bool processInput = true);
 	void Draw();
+	bool isGameOver = false;
+	void InputThread();
 };
